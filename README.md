@@ -1,5 +1,5 @@
 # overseer
-An OS and network surveillance system developed for Linux.
+Parental controls for Linux.
 
 ## About
 ###### Authors
