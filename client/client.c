@@ -11,13 +11,13 @@
 static char data[BUFFER_LENGTH];
  
 int main(int argc, char* argv[]) {
-  int fd;
+    int fd;
 
-  fd = open("/dev/server", O_RDWR);
-  if (fd < 0) {
-    perror("open failed");
-    return errno;
-  }
+    fd = open("/dev/server", O_RDWR);
+    if (fd < 0) {
+        perror("open failed");
+        return errno;
+    }
 
-  return 0;
+    return 0;
 }
