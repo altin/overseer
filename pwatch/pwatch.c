@@ -1,16 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include <dirent.h>
 #include <string.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#include <fcntl.h>
-
-// #include "tinydir.h"
-
-// more: https://jakash3.wordpress.com/2011/06/17/linux-kill-all-processes-with-name/
+#include <signal.h>
 
 int kill_process(const char* name) {
     DIR* dir = opendir("/proc");
@@ -38,86 +31,46 @@ int kill_process(const char* name) {
             continue;
         }
 
-        printf("%s\n", ent->d_name);
+        // Determine the path of the process
+        char s[1000];
+        strcpy(s, "/proc/");
+        strcat(s, ent->d_name);
+        strcat(s, "/comm");
+
+        FILE* f = fopen(s, "r");
+        if (f == NULL) {
+            printf("Failed to open file \"%s\".\n", s);
+            closedir(dir);
+            return -1;
+        }
+
+        char buffer[100];
+        // Copy the contents of the file into buffer
+        while (fgets(buffer, sizeof(buffer), f)) {}
+        fclose(f);
+
+        // Strip the newline character from the buffer
+        strtok(buffer, "\n");
+        // If name exists in buffer, kill the corresponding process
+        if (strstr(name, buffer)) {
+            // TODO(randy): Error handling?
+            pid_t p = atoi(ent->d_name);
+            kill(p, SIGKILL);
+        }
     }
     closedir(dir);
-    
+
     return 0;
 }
 
 int main(int argc, char** argv) {
-    const char* process_name = "test";
+    if (argc != 2) {
+        printf("Pass in the filename to kill\n");
+        return 0;
+    }
+
+    // TODO(randy): Deal with errors here?
+    const char* process_name = argv[1];
     int success = kill_process(process_name);
     return success;
 }
-
-// int main(int argc, char **argv) {
-//     int pid;
-//     sscanf(argv[1], "%d", &pid);
-//     printf("pid: %d\n", pid);
-// 
-//     char filename[1000];
-//     sprintf(filename, "/proc/%d/cmdline", pid);
-//     FILE *f = fopen(filename, "r");
-// 
-//     printf("%s", filename);
-// 
-//     char test[1000];
-//     fscanf(f, "%s", test);
-//     printf("contents: %s", test);
-//     fclose(f);
-// }
-
-/*
-int main() {
-    tinydir_dir dir;
-    tinydir_open(&dir, "/proc");
-
-    unsigned int flag = 0;
-
-    while (dir.has_next) {
-        tinydir_file file;
-        tinydir_readfile(&dir, &file);
-
-        if (!file.is_dir) {
-            tinydir_next(&dir);
-            continue;
-        }
-
-        for (unsigned int i =0; i < strlen(file.name); i++) {
-            if (!isdigit(file.name[i])) {
-                flag = 1;
-                break;
-            }
-        }
-
-        if (flag) {
-            flag = 0;
-            tinydir_next(&dir);
-            continue;
-        }
-
-        char dir_name[strlen(file.name) + 2];
-        sprintf(dir_name, "/%s", file.name);
-
-        printf("%s\n", dir_name);
-
-        tinydir_dir proc_dir;
-        tinydir_open(&proc_dir, dir_name);
-
-        // doesn't work because of symlinks
-        printf("files? %d\n", proc_dir.n_files);
-        printf("has_next? %d\n", proc_dir.has_next);
-        while (proc_dir.has_next) {
-            tinydir_file proc_file;
-            tinydir_readfile(&proc_dir, &proc_file);
-            printf("hey: %s", proc_file.name);
-        }
-        tinydir_close(&proc_dir);
-
-        tinydir_next(&dir);
-    }
-
-    tinydir_close(&dir);
-}
-*/
