@@ -78,16 +78,12 @@ void delete_group() {
     // Find user with overseen GID
     profile = fopen("/etc/passwd", "r");
 
-    char delim[256];
-    char delim2[256];
-    sprintf(delim, ":%s:", gid);
-    sprintf(delim2, ":%s:\n", gid);
-
     setpwent();
+    pwd = getpwent();
     char command[256];
 
     while (pwd) {
-        if (pwd->pw_gid == atoi(gid)) {
+        if (gid != NULL && pwd->pw_gid == atoi(gid)) {
             printf("%s", pwd->pw_name);
             sprintf(command, "usermod -g users %s", pwd->pw_name);
             system(command);
@@ -96,6 +92,7 @@ void delete_group() {
         }
         pwd = getpwent();
     }
+
     endpwent();
 
     system("delgroup overseen");
