@@ -107,8 +107,6 @@ int main(int argc, char** argv) {
         install();
     } else if (strcmp(argv[1], "uninstall") == 0) {
         uninstall();
-    } else if (strcmp(argv[1], "group") == 0) {
-        delete_group();
     } else {
         printf("Invalid parameter \"%s\" specified.\n", argv[1]);
         printf("Only install or uninstall arguments are permitted.\n");
