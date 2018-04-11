@@ -1,8 +1,8 @@
-inject.o: inject.c
-	gcc inject.c -o inject
+overseer.o: overseer.c
+	gcc overseer.c -o overseer
 
-inject: inject.o
-	gcc inject.o -o inject
+overseer: overseer.o
+	gcc overseer.o -o overseer
 
 clean:
-	rm -f inject
+	rm -f overseer
