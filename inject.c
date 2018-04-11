@@ -11,15 +11,30 @@ FILE* profile;
 void install() {
     system(add_group);
     system(cp_script); // Copy shell script to /etc
+
     profile = fopen("/etc/profile", "a");
+    if (profile == NULL) {
+        printf("Error opening /etc/profile.\n");
+        return;
+    }
+
     fprintf(profile, "%s", run_script); // Append shell execution command to /etc/profile
     fclose(profile);
 }
 
 void uninstall() {
-    // TODO(randy/altin): Error handling.
     profile = fopen("/etc/profile", "r");
+    if (profile == NULL) {
+        printf("Error opening /etc/profile.\n");
+        return;
+    }
+
     FILE* temp = fopen("/etc/profile_temp", "w");
+    if (temp == NULL) {
+        printf("Error opening /etc/profile_temp.\n");
+        return;
+    }
+
     char buffer[256];
 
     while (fgets(buffer, sizeof(buffer), profile)) {
@@ -40,10 +55,19 @@ void uninstall() {
 }
 
 int main(int argc, char** argv) {
+    if (argc != 2) {
+        printf("Only install or uninstall arguments are permitted.\n");
+        return -1;
+    }
+
     if (strcmp(argv[1], "install") == 0) {
         install();
     } else if (strcmp(argv[1], "uninstall") == 0) {
         uninstall();
+    } else {
+        printf("Invalid parameter \"%s\" specified.\n", argv[1]);
+        printf("Only install or uninstall arguments are permitted.\n");
+        return -1;
     }
 
     return 0;
