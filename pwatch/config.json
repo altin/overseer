@@ -1,0 +1,6 @@
+{
+    "process_blacklist": [
+        "gedit",
+        "firefox"
+    ]
+}
