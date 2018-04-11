@@ -4,6 +4,76 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/sysinfo.h>
+
+#include "../third_party/frozen/frozen.c"
+
+#define MAX_NAME_LEN 256
+
+int kill_process(const char*);
+static void scan_array(const char*, int, void*);
+void cleanup();
+
+typedef struct Process {
+    char* name;
+} Process;
+
+Process* processes;
+static unsigned int num_processes = 0;
+
+int main(int argc, char** argv) {
+    char* config_json = json_fread("config.json");
+    if (config_json == NULL) {
+        printf("Failed to read \"config.json\"");
+        return -1;
+    }
+
+    json_scanf( config_json
+              , strlen(config_json)
+              , "{ process_blacklist:%M }"
+              , scan_array
+              );
+    free(config_json);
+
+    struct sysinfo si;
+    int num_sys_processes = sysinfo(&si) == 0 ? (int)si.procs : 0;
+
+    while (1) {
+        sleep(1);
+        if (sysinfo(&si) == 0) {
+            // Check if a new process has started.
+            if (num_sys_processes != (int)si.procs) {
+                // Check if the new process that was started is in our blacklist.
+                // If it is, we kill it.
+                for (unsigned int i = 0; i < num_processes; i++) {
+                    kill_process(processes[i].name);
+                }
+                num_sys_processes = (int)si.procs;
+            }
+        }
+    }
+
+    cleanup();
+
+    return 0;
+}
+
+static void scan_array(const char* str, int len, void* user_data) {
+    struct json_token t;
+    // Parse the array to determine its length.
+    for (int i = 0; json_scanf_array_elem(str, len, "", i, &t) > 0; i++) {
+        num_processes++;
+    }
+
+    processes = malloc(num_processes * sizeof(*processes));
+    for (int i = 0; json_scanf_array_elem(str, len, "", i, &t) > 0; i++) {
+        char process_name[MAX_NAME_LEN];
+        sprintf(process_name, "%.*s", t.len, t.ptr);
+        processes[i].name = (char*)malloc(strlen(process_name) + 1);
+        strcpy(processes[i].name, process_name);
+    }
+}
 
 int kill_process(const char* name) {
     DIR* dir = opendir("/proc");
@@ -39,12 +109,13 @@ int kill_process(const char* name) {
 
         FILE* f = fopen(s, "r");
         if (f == NULL) {
-            printf("Failed to open file \"%s\".\n", s);
-            closedir(dir);
-            return -1;
+            // printf("Failed to open file \"%s\".\n", s);
+            // closedir(dir);
+            // return -1;
+            continue;
         }
 
-        char buffer[100];
+        char buffer[MAX_NAME_LEN];
         // Copy the contents of the file into buffer.
         while (fgets(buffer, sizeof(buffer), f)) {}
         fclose(f);
@@ -64,13 +135,11 @@ int kill_process(const char* name) {
     return 0;
 }
 
-int main(int argc, char** argv) {
-    if (argc != 2) {
-        printf("A process name is required\n");
-        return 0;
+void cleanup() {
+    for (unsigned int i = 0; i < num_processes; i++) {
+        free(processes[i].name);
+        processes[i].name = NULL;
     }
-
-    const char* process_name = argv[1];
-    int result = kill_process(process_name);
-    return result;
+    free(processes);
+    processes = NULL;
 }
