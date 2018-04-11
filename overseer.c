@@ -62,9 +62,7 @@ void delete_group() {
     char buffer[256];
     char* gid;
     char* user;
-    // struct group *grp;
     struct passwd* pwd;
-    //char* p = calloc()
 
     // Find GID of overseer group name
     profile = fopen("/etc/group", "r");
@@ -101,47 +99,6 @@ void delete_group() {
     endpwent();
 
     system("delgroup overseen");
-
-    /*
-    while (fgets(buffer, sizeof(buffer), profile)) {
-        user = strstr(buffer, delim);
-        if (user == NULL) {
-            continue;
-        } else {
-            user = strtok(buffer, delim2);
-            printf("%s", user);
-
-            char command[256];
-            sprintf(command, "usermod -g users %s", user);
-            system(command);
-
-            printf("Kicked %s out of overseen\n", user);
-
-        }
-
-        //system("delgroup overseen");
-    }
-    */
-
-    //gid_t man = 1002;
-    //grp = getgrgid(man);
-    //users = grp->gr_mem;
-    //char** ptr = grp->gr_mem;
-    //int i =0;
-    //ptr[0] = "bob";
-    //printf("%s", *ptr++);
-    //printf("%s", *users[0]);
-    //while (*ptr != NULL) {
-        //printf("%s", *ptr);
-        //ptr++;
-    //}
-    //for (char* c = *ptr; c; c=*++ptr) {
-        //printf("%s", c);
-    //}
-    //for (char** p = users; *p; ++p) {
-        //char* temp = *p;
-        //printf("%s", temp);
-    //}
 }
 
 int main(int argc, char** argv) {
