@@ -1,4 +1,3 @@
-#include "overseer.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
@@ -6,21 +5,23 @@
 #include <pwd.h>
 #include <sys/stat.h>
 
-const char add_group[] = "groupadd overseen";
-const char cp_script[] = "cp overseen-ug.sh /etc";
+#include "overseer.h"
+
+const char add_group[]  = "groupadd overseen";
+const char cp_script[]  = "cp overseen-ug.sh /etc";
 const char run_script[] = "bash /etc/overseen-ug.sh";
 
 void install() {
     system(add_group);
-    system(cp_script); // Copy shell script to /etc
+    system(cp_script); // Copy shell script to /etc.
 
     FILE* profile = fopen("/etc/profile", "a");
     if (profile == NULL) {
-        printf("Error opening /etc/profile.\n");
+        printf("Error opening '/etc/profile'.\n");
         return;
     }
 
-    fprintf(profile, "%s", run_script); // Append shell execution command to /etc/profile
+    fprintf(profile, "%s", run_script); // Append shell execution command to /etc/profile.
     fclose(profile);
     printf("Installed overseer under user group 'overseen'\n");
 }
@@ -28,13 +29,13 @@ void install() {
 void uninstall() {
     FILE* profile = fopen("/etc/profile", "r");
     if (profile == NULL) {
-        printf("Error opening /etc/profile.\n");
+        printf("Error opening '/etc/profile'.\n");
         return;
     }
 
     FILE* temp = fopen("/etc/profile_temp", "w");
     if (temp == NULL) {
-        printf("Error opening /etc/profile_temp.\n");
+        printf("Error opening '/etc/profile_temp'.\n");
         return;
     }
 
@@ -60,11 +61,13 @@ void uninstall() {
 void delete_group() {
     char buffer[256];
     char* gid;
-    char* user;
-    struct passwd* pwd;
 
-    // Find GID of overseer group name
+    // Find GID of overseer group name.
     FILE* group = fopen("/etc/group", "r");
+    if (group == NULL) {
+        printf("Error opening '/etc/group'.\n");
+        return;
+    }
 
     while (fgets(buffer, sizeof(buffer), group)) {
         gid = strstr(buffer, "overseen:x");
@@ -75,9 +78,10 @@ void delete_group() {
         }
     }
     fclose(group);
-    // Find user with overseen GID
+
+    // Find user with overseen GID.
     setpwent();
-    pwd = getpwent();
+    struct passwd* pwd = getpwent();
 
     char command[256];
 
@@ -86,7 +90,7 @@ void delete_group() {
             sprintf(command, "usermod -g users %s", pwd->pw_name);
             system(command);
 
-            printf("Kicked %s out of overseen\n", pwd->pw_name);
+            printf("Kicked '%s' out of overseen\n", pwd->pw_name);
         }
         pwd = getpwent();
     }
@@ -106,7 +110,7 @@ int main(int argc, char** argv) {
     } else if (strcmp(argv[1], "uninstall") == 0) {
         uninstall();
     } else {
-        printf("Invalid parameter \"%s\" specified.\n", argv[1]);
+        printf("Invalid parameter '%s' specified.\n", argv[1]);
         printf("Only install or uninstall arguments are permitted.\n");
         return -1;
     }
