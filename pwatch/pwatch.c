@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
         sleep(1);
         if (sysinfo(&si) == 0) {
             // Check if a new process has started.
-            if (num_sys_processes <= (int)si.procs) {
+            if (num_sys_processes != (int)si.procs) {
                 // Check if the new process that was started is in our blacklist.
                 // If it is, we kill it.
                 for (unsigned int i = 0; i < num_processes; i++) {
