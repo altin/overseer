@@ -4,7 +4,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
-const char * fperms (char* path, char* mode) {
+void fperms (char* path, char* mode) {
     long perms = strtol(mode, 0, 8); // Convert permission string to long
     if(chmod(path, perms) < 0) { // Chmod system call to update file permissions
         printf("Error: %s\n", strerror(errno));
@@ -13,8 +13,12 @@ const char * fperms (char* path, char* mode) {
     }
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char** argv) {
+    if (argc != 3) {
+        printf("Provide filepath and mode\n");
+        return -1;
+    }
+
     fperms(argv[1], argv[2]);
-    return(0);
+    return 0;
 }
