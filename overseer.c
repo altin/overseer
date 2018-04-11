@@ -9,13 +9,12 @@
 const char add_group[] = "groupadd overseen";
 const char cp_script[] = "cp overseen-ug.sh /etc";
 const char run_script[] = "bash /etc/overseen-ug.sh";
-FILE* profile;
 
 void install() {
     system(add_group);
     system(cp_script); // Copy shell script to /etc
 
-    profile = fopen("/etc/profile", "a");
+    FILE* profile = fopen("/etc/profile", "a");
     if (profile == NULL) {
         printf("Error opening /etc/profile.\n");
         return;
@@ -27,7 +26,7 @@ void install() {
 }
 
 void uninstall() {
-    profile = fopen("/etc/profile", "r");
+    FILE* profile = fopen("/etc/profile", "r");
     if (profile == NULL) {
         printf("Error opening /etc/profile.\n");
         return;
@@ -65,8 +64,9 @@ void delete_group() {
     struct passwd* pwd;
 
     // Find GID of overseer group name
-    profile = fopen("/etc/group", "r");
-    while (fgets(buffer, sizeof(buffer), profile)) {
+    FILE* group = fopen("/etc/group", "r");
+
+    while (fgets(buffer, sizeof(buffer), group)) {
         gid = strstr(buffer, "overseen:x");
         if (gid == NULL) {
             continue;
@@ -74,10 +74,8 @@ void delete_group() {
             gid = strtok(buffer, "overseen:x\n");
         }
     }
-
+    fclose(group);
     // Find user with overseen GID
-    profile = fopen("/etc/passwd", "r");
-
     setpwent();
     pwd = getpwent();
 
