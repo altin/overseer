@@ -1,5 +1,11 @@
 client/client
 server/server
+fswatch/fswatch
 pwatch/pwatch
 
+*.ko
+*.mod.c
+*.mod.o
 *.o
+*.order
+*.symvers
