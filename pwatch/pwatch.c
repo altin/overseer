@@ -1,9 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <ctype.h>
 #include <dirent.h>
-#include <string.h>
 #include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 int kill_process(const char* name) {
     DIR* dir = opendir("/proc");
@@ -12,7 +12,7 @@ int kill_process(const char* name) {
         printf("Failed to open /proc directory\n");
         return -1;
     }
-    struct dirent *ent;
+    struct dirent* ent;
 
     unsigned short skip_process = 0;
 
@@ -31,7 +31,7 @@ int kill_process(const char* name) {
             continue;
         }
 
-        // Determine the path of the process
+        // Determine the path of the process.
         char s[1000];
         strcpy(s, "/proc/");
         strcat(s, ent->d_name);
@@ -45,15 +45,16 @@ int kill_process(const char* name) {
         }
 
         char buffer[100];
-        // Copy the contents of the file into buffer
+        // Copy the contents of the file into buffer.
         while (fgets(buffer, sizeof(buffer), f)) {}
         fclose(f);
 
-        // Strip the newline character from the buffer
+        // Strip the newline character from the buffer.
         strtok(buffer, "\n");
-        // If name exists in buffer, kill the corresponding process
+        // If name exists in buffer, kill the corresponding process.
         if (strstr(name, buffer)) {
-            // TODO(randy): Error handling?
+            // We do not need to do any error handling here, because the for loop above
+            // determined whether or not the directory name consists of numbers.
             pid_t p = atoi(ent->d_name);
             kill(p, SIGKILL);
         }
@@ -65,12 +66,11 @@ int kill_process(const char* name) {
 
 int main(int argc, char** argv) {
     if (argc != 2) {
-        printf("Pass in the filename to kill\n");
+        printf("A process name is required\n");
         return 0;
     }
 
-    // TODO(randy): Deal with errors here?
     const char* process_name = argv[1];
-    int success = kill_process(process_name);
-    return success;
+    int result = kill_process(process_name);
+    return result;
 }
