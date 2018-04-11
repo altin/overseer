@@ -80,11 +80,11 @@ void delete_group() {
 
     setpwent();
     pwd = getpwent();
+
     char command[256];
 
     while (pwd) {
         if (gid != NULL && pwd->pw_gid == atoi(gid)) {
-            printf("%s", pwd->pw_name);
             sprintf(command, "usermod -g users %s", pwd->pw_name);
             system(command);
 
@@ -94,7 +94,6 @@ void delete_group() {
     }
 
     endpwent();
-
     system("delgroup overseen");
 }
 
