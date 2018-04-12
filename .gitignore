@@ -2,6 +2,7 @@ client/client
 server/server
 fswatch/fswatch
 pwatch/pwatch
+overseer
 
 *.tmp_versions*
 
