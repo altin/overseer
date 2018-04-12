@@ -6,23 +6,31 @@ from tkinter import ttk
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
+
+        self.blacklisted_processes = []
+
         self.notebook = ttk.Notebook(master)
         self.notebook.grid(sticky=tk.N + tk.S + tk.E + tk.W)
         self.pwatch_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.pwatch_frame, text='Process Killer')
+
         self.create_widgets()
 
     def create_widgets(self):
+        """Create the widgets."""
         self.processes_tab()
 
     def processes_tab(self):
+        """Create the widgets for the Process Killer tab and draw them."""
+        # Process Killer checkbox.
         self.process_killer_checkbox = ttk.Checkbutton( self.pwatch_frame
-                                                      , text='Enable process killer'
-                                                      , command=self.do_stuff
+                                                      , text='Enable Process Killer'
+                                                      , command=self.change_widgets_state
                                                       , onvalue=True
                                                       , offvalue=False
                                                       )
 
+        # Processes listbox.
         self.processes_listbox = tk.Listbox( self.pwatch_frame
                                            , height=15
                                            , selectmode=tk.SINGLE
@@ -30,6 +38,7 @@ class Application(tk.Frame):
                                            )
         self.processes_listbox.bind('<Double-Button-1>', self.blacklist_process)
 
+        # Blacklisted processes listbox.
         self.blacklisted_processes_listbox = tk.Listbox( self.pwatch_frame
                                                        , height=15
                                                        , selectmode=tk.SINGLE
@@ -37,12 +46,14 @@ class Application(tk.Frame):
                                                        )
         self.blacklisted_processes_listbox.bind('<Double-Button-1>', self.unblacklist_process)
 
+        # Processes listbox scrollbar.
         processes_listbox_scrollbar = tk.Scrollbar(self.pwatch_frame, orient=tk.VERTICAL)
         self.processes_listbox.config( state=tk.DISABLED
                                      , yscrollcommand=processes_listbox_scrollbar.set
                                      )
         processes_listbox_scrollbar.config(command=self.processes_listbox.yview)
 
+        # Blacklisted processes listbox scrollbar.
         blacklisted_processes_listbox_scrollbar = tk.Scrollbar( self.pwatch_frame
                                                               , orient=tk.VERTICAL
                                                               )
@@ -51,12 +62,14 @@ class Application(tk.Frame):
                                                  )
         blacklisted_processes_listbox_scrollbar.config(command=self.blacklisted_processes_listbox.yview)
 
+        # Save button.
         self.save_button = tk.Button( self.pwatch_frame
                                     , text="Save"
                                     , command=self.save
                                     , state=tk.DISABLED
                                     )
 
+        # Set grid for all widgets.
         self.process_killer_checkbox.grid(row=0, column=0)
         self.processes_listbox.grid(row=1, column=0)
         self.blacklisted_processes_listbox.grid(row=1, column=1, sticky=tk.NS)
@@ -64,47 +77,60 @@ class Application(tk.Frame):
         blacklisted_processes_listbox_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.E + tk.S)
         self.save_button.grid(row=2, column=2)
 
-    def do_stuff(self):
+    def change_widgets_state(self):
+        """Change all widgets state based on the Process Killer checkbox."""
+        # Enable all widgets if Process Killer is enabled.
         if 'selected' in self.process_killer_checkbox.state():
             self.processes_listbox.config(state=tk.NORMAL)
-            for process in running_processes():
-                # todo make sure it's not in blacklisted processes
-                self.processes_listbox.insert(tk.END, process)
             self.blacklisted_processes_listbox.config(state=tk.NORMAL)
             self.save_button.config(state=tk.NORMAL)
+
+            for process in running_processes():
+                if process not in self.blacklisted_processes:
+                    self.processes_listbox.insert(tk.END, process)
+        # Otherwise, disable all widgets.
         else:
+            # Delete all items in the listbox.
+            self.processes_listbox.delete(0, tk.END)
+            # Disable all of the widgets.
             self.processes_listbox.config(state=tk.DISABLED)
             self.blacklisted_processes_listbox.config(state=tk.DISABLED)
             self.save_button.config(state=tk.DISABLED)
-        print(self.process_killer_checkbox.state())
 
     def blacklist_process(self, event):
+        """Add a process to the blacklist listbox.
+
+        Parameters:
+          `event`: `tkinter.Event`. The event of double clicking on a process in the processes
+        listbox.
+
+        """
         widget = event.widget
         value  = widget.get(widget.curselection())
         self.processes_listbox.delete(self.processes_listbox.curselection()[0])
         self.blacklisted_processes_listbox.insert(tk.END, value)
+        self.blacklisted_processes.append(value)
 
     def unblacklist_process(self, event):
+        """Add a process to the blacklist listbox.
+
+        Parameters:
+          `event`: `tkinter.Event`. The event of double clicking a process in the blacklisted
+        processes listbox.
+
+        """
         widget = event.widget
         value  = widget.get(widget.curselection())
         self.blacklisted_processes_listbox.delete(self.blacklisted_processes_listbox.curselection()[0])
         self.processes_listbox.insert(tk.END, value)
+        self.blacklisted_processes.remove(value)
 
     def save(self):
-        if not 'selected' in process_killer_checkbox.state():
-            data = { 'enable_process_killer'  : 0
-                   , 'blacklisted_processes'  : []
-                   , 'process_kill_wait_time' : 1
-                   }
-        else:
-            blacklisted_processes = []
-            for idx in range(self.blacklisted_processes_listbox.size()):
-                blacklisted_processes.append(self.blacklisted_processes_listbox.get(idx))
-                
-                data = { 'enable_process_killer'  : 0
-                       , 'blacklisted_processes'  : blacklisted_processes
-                       , 'process_kill_wait_time' : 1
-                       }
+        """Save the settings to a JSON file."""
+        data = { 'enable_process_killer'  : 1
+               , 'blacklisted_processes'  : self.blacklisted_processes
+               , 'process_kill_wait_time' : 1
+               }
 
         with open('../config.json', 'w') as f:
             json.dump( data
@@ -115,6 +141,7 @@ class Application(tk.Frame):
                      )
 
 def running_processes():
+    """Return an alphabetically sorted list of all the running processes in the system."""
     pids      = [pid for pid in os.listdir('/proc') if pid.isdigit()]
     processes = set()
     
@@ -129,6 +156,7 @@ def running_processes():
     return sorted(processes, key=lambda word: word[0].lower())
 
 def main():
+    """The main loop of the program."""
     root = tk.Tk()
     root.title = "overseer GUI"
     app = Application(master=root)
