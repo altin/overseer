@@ -8,12 +8,14 @@
 #include "overseer.h"
 
 const char add_group[]  = "groupadd overseen";
-const char cp_script[]  = "cp overseen-ug.sh /etc";
-const char run_script[] = "bash /etc/overseen-ug.sh";
+const char cp_ug_script[]  = "cp overseen_ug.sh /etc";
+const char cp_logout_script[]  = "cp .overseen_on_logout /etc";
+const char run_script[] = "bash /etc/overseen_ug.sh";
 
 void install() {
     system(add_group);
-    system(cp_script); // Copy shell script to /etc.
+    system(cp_ug_script); // Copy user group shell script to /etc.
+    system(cp_logout_script); // Copy logout script to /etc.
 
     FILE* profile = fopen("/etc/profile", "a");
     if (profile == NULL) {
@@ -53,6 +55,7 @@ void uninstall() {
     fclose(profile);
     fclose(temp);
 
+    remove("/etc/.overseen_on_logout");
     remove("/etc/profile");
     rename("/etc/profile_temp", "/etc/profile");
     delete_group();
