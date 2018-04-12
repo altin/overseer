@@ -5,7 +5,7 @@ import tkinter as tk
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
-        self.grid(sticky=tk.N+tk.S+tk.E+tk.W)
+        self.grid(sticky=tk.N + tk.S + tk.E + tk.W)
         self.create_widgets()
 
     def create_widgets(self):
@@ -51,12 +51,21 @@ class Application(tk.Frame):
         self.save_button.grid(row=1, column=2)
 
     def save(self):
+        blacklisted_processes = []
         for idx in range(self.blacklisted_processes_listbox.size()):
-            blacklisted_processes = self.blacklisted_processes_listbox.get(idx)
+            blacklisted_processes.append(self.blacklisted_processes_listbox.get(idx))
 
         data = { 'blacklisted_processes'  : blacklisted_processes
-               , 'process_kill_wait_time' : 0
+               , 'process_kill_wait_time' : 1
                }
+
+        with open('../config.json', 'w') as f:
+            json.dump( data
+                     , f
+                     , ensure_ascii=False
+                     , indent=4
+                     , sort_keys=True
+                     )
 
 def running_processes():
     pids      = [pid for pid in os.listdir('/proc') if pid.isdigit()]
@@ -69,7 +78,8 @@ def running_processes():
         except IOError:
             continue
 
-    return processes
+    # Sort the processes set by the first letter of the word (after making it lowercase).
+    return sorted(processes, key=lambda word: word[0].lower())
 
 def main():
     root = tk.Tk()

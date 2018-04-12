@@ -23,15 +23,19 @@ Process* processes;
 static unsigned int num_processes = 0;
 
 int main(int argc, char** argv) {
-    char* config_json = json_fread("config.json");
+    char* config_json = json_fread("../config.json");
     if (config_json == NULL) {
         printf("Failed to read \"config.json\"");
         return -1;
     }
 
+    // How long to sleep in the kill loop below.
+    // Default value is 1 second.
+    int process_kill_wait_time = 1;
     json_scanf( config_json
               , strlen(config_json)
-              , "{ process_blacklist:%M }"
+              , "{ process_kill_wait_time:%d, blacklisted_processes:%M }"
+              , &process_kill_wait_time
               , scan_array
               );
     free(config_json);
@@ -40,7 +44,7 @@ int main(int argc, char** argv) {
     int num_sys_processes = sysinfo(&si) == 0 ? (int)si.procs : 0;
 
     while (1) {
-        sleep(1);
+        sleep(process_kill_wait_time);
         if (sysinfo(&si) == 0) {
             // Check if a new process has started.
             if (num_sys_processes != (int)si.procs) {
