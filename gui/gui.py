@@ -1,6 +1,7 @@
 import json
 import os
 import tkinter as tk
+import tkinter.messagebox as messagebox
 from tkinter import ttk
 
 class Application(tk.Frame):
@@ -62,6 +63,16 @@ class Application(tk.Frame):
                                                  )
         blacklisted_processes_listbox_scrollbar.config(command=self.blacklisted_processes_listbox.yview)
 
+        # Process kill wait time.
+        self.process_kill_wait_time_label = tk.Label( self.pwatch_frame
+                                                    , text="Seconds to wait before killing processes:"
+                                                    )
+        self.wait_time = tk.StringVar()
+        self.wait_time.set('1')
+        self.process_kill_wait_time_text = tk.Entry( self.pwatch_frame
+                                                   , textvariable=self.wait_time
+                                                   )
+
         # Save button.
         self.save_button = tk.Button( self.pwatch_frame
                                     , text="Save"
@@ -75,6 +86,8 @@ class Application(tk.Frame):
         self.blacklisted_processes_listbox.grid(row=1, column=1, sticky=tk.NS)
         processes_listbox_scrollbar.grid(row=1, column=0, sticky=tk.N + tk.E + tk.S)
         blacklisted_processes_listbox_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.E + tk.S)
+        self.process_kill_wait_time_label.grid(row=2, column=0)
+        self.process_kill_wait_time_text.grid(row=2, column=1)
         self.save_button.grid(row=2, column=2)
 
     def change_widgets_state(self):
@@ -127,9 +140,15 @@ class Application(tk.Frame):
 
     def save(self):
         """Save the settings to a JSON file."""
+        try:
+            wait_time = float(self.wait_time.get())
+        except:
+            messagebox.showerror("Error", "Seconds to wait textbox only accepts integers.")
+            return
+
         data = { 'enable_process_killer'  : 1
                , 'blacklisted_processes'  : self.blacklisted_processes
-               , 'process_kill_wait_time' : 1
+               , 'process_kill_wait_time' : wait_time
                }
 
         with open('../config.json', 'w') as f:
