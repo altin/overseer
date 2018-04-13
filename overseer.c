@@ -6,14 +6,14 @@
 #include <sys/stat.h>
 
 #include "overseer.h"
-#include "fswatch/fswatch.c"
+#include "fscontrol/fscontrol.c"
 
 const char add_group[]  = "groupadd overseen";
-const char cp_ug_script[]  = "cp -rp overseen_ug.sh /etc";
-const char cp_logout_script[]  = "cp -rp overseer_logout.sh /etc";
+const char cp_ug_script[]  = "cp -rp scripts/overseen_ug.sh /etc";
+const char cp_logout_script[]  = "cp -rp scripts/overseer_logout.sh /etc";
 const char run_script[] = "bash /etc/overseen_ug.sh";
 const char find_dhclient[] = "find /etc -name dhclient.conf >> /etc/overseer_dhpath";
-const char lightdm_conf[] = "cp -rp overseer_lightdm_logout /etc/lightdm/lightdm.conf";
+const char lightdm_conf[] = "cp -rp scripts/overseer_lightdm_logout /etc/lightdm/lightdm.conf";
 
 void install() {
 	uninstall();
@@ -21,24 +21,24 @@ void install() {
 	system("sudo chgrp sudo /etc/dhcp"); // Note: get the parent dir dynamically
 	fperms("/etc/dhcp", "775"); // Note: get the parent dir dynamically
 
-	system("sudo chgrp sudo overseer_dhclient_sudo.conf");
-	fperms("overseer_dhclient_sudo.conf", "775");
-	system("sudo chgrp sudo overseer_dhclient_overseen.conf");
-	fperms("overseer_dhclient_overseen.conf", "775");
+	system("sudo chgrp sudo scripts/overseer_dhclient_sudo.conf");
+	fperms("scripts/overseer_dhclient_sudo.conf", "775");
+	system("sudo chgrp sudo scripts/overseer_dhclient_overseen.conf");
+	fperms("scripts/overseer_dhclient_overseen.conf", "775");
 
 	// Note: get the parent dir dynamically
-	system("cp -rp overseer_dhclient_sudo.conf /etc/dhcp"); 
-	system("cp -rp overseer_dhclient_overseen.conf /etc/dhcp");
-	system("cp -rp overseer_dhclient_overseen.conf /etc/dhcp/dhclient.conf");
+	system("cp -rp scripts/overseer_dhclient_sudo.conf /etc/dhcp");
+	system("cp -rp scripts/overseer_dhclient_overseen.conf /etc/dhcp");
+	system("cp -rp scripts/overseer_dhclient_overseen.conf /etc/dhcp/dhclient.conf");
 
-	system("sudo chgrp sudo overseen_ug.sh");
-	fperms("overseen_ug.sh", "775");
+	system("sudo chgrp sudo scripts/overseen_ug.sh");
+	fperms("scripts/overseen_ug.sh", "775");
 
-	system("sudo chgrp sudo overseer_lightdm_logout");
-	fperms("overseer_lightdm_logout", "775");
+	system("sudo chgrp sudo scripts/overseer_lightdm_logout");
+	fperms("scripts/overseer_lightdm_logout", "775");
 
-	system("sudo chgrp sudo overseer_logout.sh");
-	fperms("overseer_logout.sh", "775");
+	system("sudo chgrp sudo scripts/overseer_logout.sh");
+	fperms("scripts/overseer_logout.sh", "775");
 
 	system("sudo chgrp sudo /etc/profile");
 	fperms("/etc/profile", "775");
@@ -46,13 +46,13 @@ void install() {
 	system("sudo chgrp sudo /etc/dhcp/dhclient.conf");
 	fperms("/etc/dhcp/dhclient.conf", "775");
 
-    system(add_group);
-    system(cp_ug_script); // Copy user group shell script to /etc.
-    system(cp_logout_script); // Copy logout script to /etc.
+  	system(add_group);
+  	system(cp_ug_script); // Copy user group shell script to /etc.
+  	system(cp_logout_script); // Copy logout script to /etc.
 	system(find_dhclient);
 	system(lightdm_conf);
 
-    FILE* profile = fopen("/etc/profile", "a");
+	FILE* profile = fopen("/etc/profile", "a");
     if (profile == NULL) {
         printf("Error opening '/etc/profile'.\n");
         return;
@@ -93,7 +93,7 @@ void uninstall() {
     fclose(temp);
 
 	remove("/etc/lightdm/lightdm.conf");
-	system("cp -rp overseer_dhclient_sudo.conf /etc/dhcp/dhclient.conf"); // Note: get the parent dir dynamically
+	system("cp -rp scripts/overseer_dhclient_sudo.conf /etc/dhcp/dhclient.conf"); // Note: get the parent dir dynamically
 	remove("/etc/dhcp/overseer_dhclient_sudo.conf"); // Note: get the parent dir dynamically
 	remove("/etc/dhcp/overseer_dhclient_overseen.conf"); // Note: get the parent dir dynamically
 	remove("/etc/overseer_dhpath");
