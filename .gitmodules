@@ -1,3 +1,0 @@
-[submodule "frozen"]
-           path = pcontol/include/frozen
-           url = https://github.com/cesanta/frozen.git
