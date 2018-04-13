@@ -17,6 +17,8 @@ const char lightdm_conf[] = "cp -rp scripts/overseer_lightdm_logout /etc/lightdm
 
 void install() {
 	uninstall();
+	
+	fperms("/pcontrol/pcontrol.sh", "777");
 
 	system("cd pcontrol; make -f Makefile");
 	fperms("pcontrol", "775");
