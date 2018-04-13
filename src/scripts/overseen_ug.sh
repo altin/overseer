@@ -13,8 +13,7 @@ if [ $GROUP != "overseen" ]; then
 fi
 
 if [ $GROUP = "overseen" ]; then
-	echo "Overseen user logged in"
-    cd /etc/overseer/src/pcontrol
-	pkill pcontrol
-	setsid ./pcontrol
+    echo "Overseen user logged in"
+    mkdir $HOME/.config/autostart
+    cp /etc/overseer/src/scripts/pcontrol.desktop $HOME/.config/autostart/
 fi
