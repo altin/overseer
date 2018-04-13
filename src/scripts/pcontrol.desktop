@@ -1,0 +1,4 @@
+[Desktop Entry]
+Type=Application
+Exec=/etc/overseer/src/pcontrol/pcontrol.sh
+X-GNOME-Autostart-enabled=true
