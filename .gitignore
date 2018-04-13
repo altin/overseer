@@ -1,8 +1,7 @@
-pcontrol/pcontrol
 overseer
+src/pcontrol/pcontrol
 
 *.tmp_versions*
-
 *.cmd
 *.ko
 *.mod.c
