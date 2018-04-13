@@ -1,2 +1,2 @@
 [SeatDefaults]
-session-cleanup-script=/etc/overseer_logout.sh
+session-cleanup-script=/etc/overseer/src/scripts/overseer_logout.sh
