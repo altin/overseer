@@ -15,5 +15,6 @@ fi
 if [ $GROUP = "overseen" ]; then
 	echo "Overseen user logged in"
     cd /etc/overseer/src/pcontrol
-	#setsid ./pcontrol
+	pkill pcontrol
+	setsid ./pcontrol
 fi
