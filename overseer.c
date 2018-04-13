@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 
 #include "overseer.h"
-#include "fscontrol/fscontrol.c"
+#include "fscontrol/fscontrol.h"
 
 const char add_group[]  = "groupadd overseen";
 const char cp_ug_script[]  = "cp -rp scripts/overseen_ug.sh /etc";
