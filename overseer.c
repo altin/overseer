@@ -62,7 +62,6 @@ void install() {
     fclose(profile);
     printf("Installed overseer under user group 'overseen'\n");
 	printf("You must reboot your computer for changes to take effect.\n");
-
 }
 
 void uninstall() {
