@@ -1,0 +1,3 @@
+[submodule "frozen"]
+           path = third_party/frozen
+           url = https://github.com/cesanta/frozen.git
