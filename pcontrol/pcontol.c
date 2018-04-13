@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <sys/sysinfo.h>
 
-#include "../third_party/frozen/frozen.c"
+#include "include/frozen/frozen.c"
 
 #define MAX_NAME_LEN 256
 
@@ -23,9 +23,9 @@ Process* processes;
 static unsigned int num_processes = 0;
 
 int main(int argc, char** argv) {
-    char* config_json = json_fread("../config.json");
+    char* config_json = json_fread("config.json");
     if (config_json == NULL) {
-        printf("Failed to read \"config.json\"");
+        printf("Failed to read 'config.json'");
         return -1;
     }
 
@@ -113,9 +113,6 @@ int kill_process(const char* name) {
 
         FILE* f = fopen(s, "r");
         if (f == NULL) {
-            // printf("Failed to open file \"%s\".\n", s);
-            // closedir(dir);
-            // return -1;
             continue;
         }
 

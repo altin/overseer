@@ -1,8 +1,8 @@
-pwatch.o: pwatch.c
-	gcc pwatch.c -o pwatch
+pcontol.o: pcontol.c
+	gcc pcontol.c -o pcontol
 
-pwatch: pwatch.o
-	gcc pwatch.o -o pwatch
+pcontol: pcontol.o
+	gcc pcontol.o -o pcontol
 
 clean:
-	rm -f pwatch
+	rm -f pcontol
