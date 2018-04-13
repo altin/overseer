@@ -1,0 +1,8 @@
+{
+    "blacklisted_processes": [
+        "gedit",
+        "firefox"
+    ],
+    "enable_process_killer": 1,
+    "process_kill_wait_time": 1
+}
