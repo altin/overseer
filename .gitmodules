@@ -1,0 +1,3 @@
+[submodule "frozen"]
+	path = pcontrol/include/frozen
+	url = https://github.com/cesanta/frozen.git
