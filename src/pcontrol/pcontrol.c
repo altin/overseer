@@ -10,8 +10,9 @@
 #include "include/frozen/frozen.c"
 
 #define MAX_NAME_LEN 256
+#define MAX_PATH_LEN 1000
 
-int kill_process(const char*);
+int kill_processes();
 static void scan_array(const char*, int, void*);
 void cleanup();
 
@@ -41,7 +42,7 @@ int main(int argc, char** argv) {
     free(config_json);
 
     struct sysinfo si;
-    int num_sys_processes = sysinfo(&si) == 0 ? (int)si.procs : 0;
+    int num_sys_processes = 0;
 
     while (1) {
         sleep(process_kill_wait_time);
@@ -50,9 +51,7 @@ int main(int argc, char** argv) {
             if (num_sys_processes != (int)si.procs) {
                 // Check if the new process that was started is in our blacklist.
                 // If it is, we kill it.
-                for (unsigned int i = 0; i < num_processes; i++) {
-                    kill_process(processes[i].name);
-                }
+                kill_processes();
                 num_sys_processes = (int)si.procs;
             }
         }
@@ -63,6 +62,10 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+/* Scan and parse a JSON array
+ * Code referenced from official frozen docs:
+ * https://github.com/cesanta/frozen#json_scanf-json_vscanf
+ */
 static void scan_array(const char* str, int len, void* user_data) {
     struct json_token t;
     // Parse the array to determine its length.
@@ -74,20 +77,20 @@ static void scan_array(const char* str, int len, void* user_data) {
     for (int i = 0; json_scanf_array_elem(str, len, "", i, &t) > 0; i++) {
         char process_name[MAX_NAME_LEN];
         sprintf(process_name, "%.*s", t.len, t.ptr);
-        processes[i].name = (char*)malloc(strlen(process_name) + 1);
+        processes[i].name = (char*)malloc(strlen(process_name));
         strcpy(processes[i].name, process_name);
     }
 }
 
-int kill_process(const char* name) {
+/* Kill all blacklisted process if they are run */
+int kill_processes() {
     DIR* dir = opendir("/proc");
-
     if (dir == NULL) {
-        printf("Failed to open /proc directory\n");
+        printf("Failed to open '/proc'.\n");
         return -1;
     }
-    struct dirent* ent;
 
+    struct dirent* ent;
     unsigned short skip_process = 0;
 
     // Iterate through each folder in the directory.
@@ -106,16 +109,17 @@ int kill_process(const char* name) {
         }
 
         // Determine the path of the process.
-        char s[1000];
-        strcpy(s, "/proc/");
-        strcat(s, ent->d_name);
-        strcat(s, "/comm");
+        char path[MAX_PATH_LEN];
+        strcpy(path, "/proc/");
+        strcat(path, ent->d_name);
+        strcat(path, "/comm");
 
-        FILE* f = fopen(s, "r");
+        FILE* f = fopen(path, "r");
         if (f == NULL) {
             continue;
         }
 
+        // Determine the name of the executable.
         char buffer[MAX_NAME_LEN];
         // Copy the contents of the file into buffer.
         while (fgets(buffer, sizeof(buffer), f)) {}
@@ -123,12 +127,15 @@ int kill_process(const char* name) {
 
         // Strip the newline character from the buffer.
         strtok(buffer, "\n");
-        // If name exists in buffer, kill the corresponding process.
-        if (strstr(name, buffer)) {
-            // We do not need to do any error handling here, because the for loop above
-            // determined whether or not the directory name consists of numbers.
-            pid_t p = atoi(ent->d_name);
-            kill(p, SIGKILL);
+        // Loop through the blacklisted processes and check if the current process
+        // is a blacklisted process.
+        for (unsigned int i = 0; i < num_processes; i++) {
+            if (strcmp(buffer, processes[i].name) == 0) {
+                // We do not need to do any error handling here, because we have already
+                // determined whether or not the directory name consists of numbers.
+                pid_t p = atoi(ent->d_name);
+                kill(p, SIGKILL);
+            }
         }
     }
     closedir(dir);
@@ -136,6 +143,7 @@ int kill_process(const char* name) {
     return 0;
 }
 
+/* Deallocate all dynamically allocated memory */
 void cleanup() {
     for (unsigned int i = 0; i < num_processes; i++) {
         free(processes[i].name);
