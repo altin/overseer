@@ -2,7 +2,7 @@
 # Overseer logout script
 
 OPENDNS="supersede domain-name-servers 208.67.222.123,208.67.220.123;"
-DHCLIENT=$(head -n 1 /etc/overseer_dhpath)
+DHCLIENT=$(head -n 1 /etc/overseer/src/scripts/overseer_dhpath)
 DHPATH=$(dirname $DHCLIENT)
 DHCLIENTOVERSEEN="$DHPATH/overseer_dhclient_overseen.conf"
 

@@ -2,20 +2,19 @@
 set -e
 
 ARG1=$1
-log="log.txt"
 
 if [ $ARG1 == "install" ]; then
-    cd src/pcontrol
-    make -f Makefile
-    cd ..
+	mkdir /etc/overseer
+	cp -rp src /etc/overseer
+    cd /etc/overseer/src
     make -f Makefile
     ./overseer install
 elif [ $ARG1 == "uninstall" ]; then
-    cd src
+    cd /etc/overseer/src
     ./overseer uninstall
     make clean -f Makefile
-    cd pcontrol
-    make clean -f Makefile
+	cd /etc
+	rm -r overseer
 else
-    echo "Error: Incorrect argument. Usage: ./run [install | uninstall]"
+    echo "Error: Incorrect argument. Usage: sudo ./run.sh [install | uninstall]"
 fi

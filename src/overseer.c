@@ -9,14 +9,21 @@
 #include "fscontrol/fscontrol.h"
 
 const char add_group[]  = "groupadd overseen";
-const char cp_ug_script[]  = "cp -rp scripts/overseen_ug.sh /etc";
-const char cp_logout_script[]  = "cp -rp scripts/overseer_logout.sh /etc";
-const char run_script[] = "bash /etc/overseen_ug.sh";
-const char find_dhclient[] = "find /etc -name dhclient.conf >> /etc/overseer_dhpath";
+//const char cp_ug_script[]  = "cp -rp scripts/overseen_ug.sh /etc/overseer/src/scripts";
+//const char cp_logout_script[]  = "cp -rp scripts/overseer_logout.sh /etc/overseer/src/scripts";
+const char run_script[] = "bash /etc/overseer/src/scripts/overseen_ug.sh";
+const char find_dhclient[] = "find /etc -name dhclient.conf >> /etc/overseer/src/scripts/overseer_dhpath";
 const char lightdm_conf[] = "cp -rp scripts/overseer_lightdm_logout /etc/lightdm/lightdm.conf";
 
 void install() {
 	uninstall();
+
+	system("cd pcontrol; make -f Makefile");
+	fperms("pcontrol", "775");
+	system("sudo chgrp sudo pcontrol");
+
+	fperms("/etc/overseer", "775");
+	system("sudo chgrp sudo /etc/overseer");
 
 	system("sudo chgrp sudo /etc/dhcp"); // Note: get the parent dir dynamically
 	fperms("/etc/dhcp", "775"); // Note: get the parent dir dynamically
@@ -47,8 +54,8 @@ void install() {
 	fperms("/etc/dhcp/dhclient.conf", "775");
 
   	system(add_group);
-  	system(cp_ug_script); // Copy user group shell script to /etc.
-  	system(cp_logout_script); // Copy logout script to /etc.
+  	//system(cp_ug_script); // Copy user group shell script to /etc/overseer/src.
+  	//system(cp_logout_script); // Copy logout script to /etc/overseer/src.
 	system(find_dhclient);
 	system(lightdm_conf);
 
@@ -60,11 +67,12 @@ void install() {
 
     fprintf(profile, "%s", run_script); // Append shell execution command to /etc/profile.
     fclose(profile);
-    printf("Installed overseer under user group 'overseen'\n");
-	printf("Finished. You must reboot your computer for changes to take effect.\n");
+    printf("Installed overseer under user group 'overseen'. Please reboot your computer. \n");
 }
 
 void uninstall() {
+	system("cd pcontrol; make clean -f Makefile; cd ..");
+
     FILE* profile = fopen("/etc/profile", "r");
     if (profile == NULL) {
         printf("Error opening '/etc/profile'.\n");
@@ -95,9 +103,9 @@ void uninstall() {
 	system("cp -rp scripts/overseer_dhclient_sudo.conf /etc/dhcp/dhclient.conf"); // Note: get the parent dir dynamically
 	remove("/etc/dhcp/overseer_dhclient_sudo.conf"); // Note: get the parent dir dynamically
 	remove("/etc/dhcp/overseer_dhclient_overseen.conf"); // Note: get the parent dir dynamically
-	remove("/etc/overseer_dhpath");
-	remove("/etc/overseen_ug.sh");
-    remove("/etc/overseer_logout.sh");
+	//remove("/etc/overseer/src/overseer_dhpath");
+	//remove("/etc/overseer/src/overseen_ug.sh");
+    //remove("/etc/overseer/src/overseer_logout.sh");
     remove("/etc/profile");
     rename("/etc/profile_temp", "/etc/profile");
     delete_group();
