@@ -1,7 +1,4 @@
-client/client
-server/server
-fswatch/fswatch
-pwatch/pwatch
+pcontrol/pcontrol
 overseer
 
 *.tmp_versions*
