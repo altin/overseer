@@ -1,8 +1,8 @@
-pcontol.o: pcontol.c
-	gcc pcontol.c -o pcontol
+pcontrol.o: pcontrol.c
+	gcc pcontrol.c -o pcontrol
 
-pcontol: pcontol.o
-	gcc pcontol.o -o pcontol
+pcontrol: pcontrol.o
+	gcc pcontrol.o -o pcontrol
 
 clean:
-	rm -f pcontol
+	rm -f pcontrol
