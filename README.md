@@ -18,20 +18,20 @@ Overseer is a course project designed for COMP 3000 (Operating Systems) at Carle
 ###### Instructions
 **ALL STEPS ASSUME YOU ARE IN THE OVERSEER DIRECTORY AND A SUDO USER** 
 
-##### Dependencies
+###### Dependencies
 1. Ensure Python3 is installed.  
 2. Install tkinter: `sudo apt-get install python3-tk`  
 3. Run the pcontrol GUI: `python3 pcontrol_gui.py`  
 **Note: After saving,the config (config.json) is stored in the overseer/src/pcontrol directory.** 
 
-##### Install
+###### Install
 1. `sudo ./run.sh install`
 2. Add a user `sudo useradd -g overseen -m NAME_HERE`  
 3. Provide a password `sudo passwd NAME_HERE` 
 4. Reboot your system  
 Done! The `overseen` user group should now be running an OpenDNS web filter configuration, as well as the process monitor with the predefined process blacklist created in the sudo user.  
 
-##### Uninstall  
+###### Uninstall  
 `sudo ./run.sh uninstall`  
 
 ###### Third-Party Libraries
