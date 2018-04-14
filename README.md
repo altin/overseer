@@ -32,7 +32,7 @@ Overseer is a course project designed for COMP 3000 (Operating Systems) at Carle
 Done! The `overseen` user group should now be running an OpenDNS web filter configuration, as well as the process monitor with the predefined process blacklist created in the sudo user.  
 
 ##### Uninstall  
-sudo ./run.sh uninstall  
+`sudo ./run.sh uninstall`  
 
 ###### Third-Party Libraries
 * [frozen](https://github.com/cesanta/frozen)
