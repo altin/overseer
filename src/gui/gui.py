@@ -181,7 +181,7 @@ def running_processes():
 def main():
     """The main loop of the program."""
     root = tk.Tk()
-    root.title = "overseer GUI"
+    root.title('pcontrol Configuration')
     app = Application(master=root)
     app.mainloop()
 
