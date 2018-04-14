@@ -155,7 +155,7 @@ class Application(tk.Frame):
                , 'process_kill_wait_time' : wait_time
                }
 
-        with open('../config.json', 'w') as f:
+        with open('src/pcontrol/config.json', 'w') as f:
             json.dump( data
                      , f
                      , ensure_ascii=False
