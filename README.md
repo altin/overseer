@@ -1,5 +1,5 @@
 # overser
-Overseer is a system usage management tool designed for Ubuntu. It creates a custom user group with restricted website access using OpenDNS, and process monitoring.
+Overseer is a system usage management tool designed for Ubuntu. It creates a custom user group with dynamic web and and process monitoring.
 
 ## About
 ###### Authors
