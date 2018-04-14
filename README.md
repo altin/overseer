@@ -29,7 +29,7 @@ Overseer is a course project designed for COMP 3000 (Operating Systems) at Carle
 2. Add a user `sudo useradd -g overseen -m NAME_HERE`  
 3. Provide a password `sudo passwd NAME_HERE` 
 4. Reboot your system  
-Done! The `overseen` user group should now be running an OpenDNS web filter configuration, as well as the process monitor with the predefined process blacklist created in the sudo user.  
+Done! The `overseen` user group should now be running an OpenDNS web filter configuration, as well as the process monitor with the predefined process blacklist created from the sudo user.  
 
 ###### Uninstall  
 `sudo ./run.sh uninstall`  
