@@ -1,5 +1,5 @@
-# overseer
-System Usage Management for Linux.
+# overser
+Overseer is a system usage management tool designed for Ubuntu. It creates a custom user group with restricted website access using OpenDNS, and process monitoring.
 
 ## About
 ###### Authors
