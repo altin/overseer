@@ -31,6 +31,7 @@ class Application(tk.Frame):
                                                       , offvalue=False
                                                       )
 
+        processes_label = tk.Label(self.pwatch_frame, text='Processes: ')
         # Processes listbox.
         self.processes_listbox = tk.Listbox( self.pwatch_frame
                                            , height=15
@@ -39,6 +40,7 @@ class Application(tk.Frame):
                                            )
         self.processes_listbox.bind('<Double-Button-1>', self.blacklist_process)
 
+        blacklisted_processes_label = tk.Label(self.pwatch_frame, text='Blacklisted Processes: ')
         # Blacklisted processes listbox.
         self.blacklisted_processes_listbox = tk.Listbox( self.pwatch_frame
                                                        , height=15
@@ -82,13 +84,15 @@ class Application(tk.Frame):
 
         # Set grid for all widgets.
         self.process_killer_checkbox.grid(row=0, column=0)
-        self.processes_listbox.grid(row=1, column=0)
-        self.blacklisted_processes_listbox.grid(row=1, column=1, sticky=tk.NS)
-        processes_listbox_scrollbar.grid(row=1, column=0, sticky=tk.N + tk.E + tk.S)
-        blacklisted_processes_listbox_scrollbar.grid(row=1, column=1, sticky=tk.N + tk.E + tk.S)
-        self.process_kill_wait_time_label.grid(row=2, column=0)
-        self.process_kill_wait_time_text.grid(row=2, column=1)
-        self.save_button.grid(row=2, column=2)
+        processes_label.grid(row=1, column=0)
+        blacklisted_processes_label.grid(row=1, column=1)
+        self.processes_listbox.grid(row=2, column=0)
+        self.blacklisted_processes_listbox.grid(row=2, column=1, sticky=tk.NS)
+        processes_listbox_scrollbar.grid(row=2, column=0, sticky=tk.N + tk.E + tk.S)
+        blacklisted_processes_listbox_scrollbar.grid(row=2, column=1, sticky=tk.N + tk.E + tk.S)
+        self.process_kill_wait_time_label.grid(row=3, column=0)
+        self.process_kill_wait_time_text.grid(row=3, column=1)
+        self.save_button.grid(row=4, column=2)
 
     def change_widgets_state(self):
         """Change all widgets state based on the Process Killer checkbox."""
