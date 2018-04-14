@@ -9,8 +9,6 @@
 #include "fscontrol/fscontrol.h"
 
 const char add_group[]  = "groupadd overseen";
-//const char cp_ug_script[]  = "cp -rp scripts/overseen_ug.sh /etc/overseer/src/scripts";
-//const char cp_logout_script[]  = "cp -rp scripts/overseer_logout.sh /etc/overseer/src/scripts";
 const char run_script[] = "bash /etc/overseer/src/scripts/overseen_ug.sh";
 const char find_dhclient[] = "find /etc -name dhclient.conf >> /etc/overseer/src/scripts/overseer_dhpath";
 const char lightdm_conf[] = "cp -rp scripts/overseer_lightdm_logout /etc/lightdm/lightdm.conf";
@@ -27,15 +25,14 @@ void install() {
 	fperms("/etc/overseer", "775");
 	system("sudo chgrp sudo /etc/overseer");
 
-	system("sudo chgrp sudo /etc/dhcp"); // Note: get the parent dir dynamically
-	fperms("/etc/dhcp", "775"); // Note: get the parent dir dynamically
+	system("sudo chgrp sudo /etc/dhcp"); 
+	fperms("/etc/dhcp", "775"); 
 
 	system("sudo chgrp sudo scripts/overseer_dhclient_sudo.conf");
 	fperms("scripts/overseer_dhclient_sudo.conf", "775");
 	system("sudo chgrp sudo scripts/overseer_dhclient_overseen.conf");
 	fperms("scripts/overseer_dhclient_overseen.conf", "775");
 
-	// Note: get the parent dir dynamically
 	system("cp -rp scripts/overseer_dhclient_sudo.conf /etc/dhcp");
 	system("cp -rp scripts/overseer_dhclient_overseen.conf /etc/dhcp");
 	system("cp -rp scripts/overseer_dhclient_overseen.conf /etc/dhcp/dhclient.conf");
@@ -56,8 +53,6 @@ void install() {
 	fperms("/etc/dhcp/dhclient.conf", "775");
 
   	system(add_group);
-  	//system(cp_ug_script); // Copy user group shell script to /etc/overseer/src.
-  	//system(cp_logout_script); // Copy logout script to /etc/overseer/src.
 	system(find_dhclient);
 	system(lightdm_conf);
 
@@ -105,9 +100,7 @@ void uninstall() {
 	system("cp -rp scripts/overseer_dhclient_sudo.conf /etc/dhcp/dhclient.conf"); // Note: get the parent dir dynamically
 	remove("/etc/dhcp/overseer_dhclient_sudo.conf"); // Note: get the parent dir dynamically
 	remove("/etc/dhcp/overseer_dhclient_overseen.conf"); // Note: get the parent dir dynamically
-	//remove("/etc/overseer/src/overseer_dhpath");
-	//remove("/etc/overseer/src/overseen_ug.sh");
-    //remove("/etc/overseer/src/overseer_logout.sh");
+
     remove("/etc/profile");
     rename("/etc/profile_temp", "/etc/profile");
     delete_group();
