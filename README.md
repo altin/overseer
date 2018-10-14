@@ -1,4 +1,4 @@
-# overser
+# overseer
 Overseer is a system usage management tool designed for Ubuntu. It creates a custom user group with dynamic web and process restrictions for the purpose of controlling computer use.
 
 ## About
